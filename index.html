@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" width="device-width, initial-scale=1.0">
+    <title>ThinkBot AI</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --accent: #ff6b35;
+            --dark: #1a1a1a;
+            --light: #f5f5f5;
+            --gradient: linear-gradient(135deg, #4a90e2, #ff6b35);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        nav.scrolled {
+            padding: 1rem;
+            background: rgba(26, 26, 26, 0.98);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(to right, 
+                #4a90e2 0%, 
+                #ff6b35 50%, 
+                #4a90e2 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        /* Updated Robot Animation */
+        .robot {
+            width: 400px;
+            height: 300px;
+            margin: 2rem auto;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .eye-container {
+            display: flex;
+            justify-content: center;
+            gap: 140px; /* Eye spacing */
+            width: 100%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s ease;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .eye {
+            width: 100px;  /* Match GUI width */
+            height: 130px; /* Match GUI height */
+            background: rgb(0, 191, 255); /* DeepSkyBlue */
+            border-radius: 20px; /* Rounded corners */
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 191, 255, 0.5); /* Glow effect */
+            transition: all 0.3s;
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            transform: none !important;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .eye::after {
+            display: none;
+        }
+
+        /* LED Lines */
+        .led-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        .led-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.2);
+            transform: translateY(-50%);
+            animation: scanLine 2s linear infinite;
+        }
+
+        @keyframes scanLine {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Squint Animation */
+        @keyframes squint {
+            0%, 100% { height: 130px; }
+            50% { height: 65px; } /* Half height */
+        }
+
+        /* Look Around Animation */
+        @keyframes lookAround {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-50px); }
+            50% { transform: translateX(0); }
+            75% { transform: translateX(50px); }
+            100% { transform: translateX(0); }
+        }
+
+        .squinting .eye {
+            animation: squint 0.3s ease-in-out;
+        }
+
+        .looking {
+            animation: lookAround 4s ease-in-out infinite;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            background: #232323;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--dark);
+            padding: 2rem;
+            border-radius: 15px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Roadmap Section */
+        .roadmap {
+            padding: 6rem 2rem;
+            background: #232323;
+        }
+
+        .timeline {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .milestone {
+            background: var(--dark);
+            padding: 2rem;
+            border-radius: 15px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.5s ease;
+        }
+
+        .milestone.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Calendar Section */
+        .calendar-section {
+            padding: 6rem 2rem;
+            background: var(--dark);
+        }
+
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background: rgba(0,0,0,0.3);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .calendar {
+            background: #232323;
+            padding: 2rem;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: var(--dark);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .calendar-day.has-event {
+            background: var(--primary);
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.1);
+        }
+
+        .event-details {
+            background: #232323;
+            padding: 2rem;
+            border-radius: 15px;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s ease;
+        }
+
+        .event-details.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 3rem; }
+            .hero p { font-size: 1.2rem; }
+            .robot { width: 200px; height: 200px; }
+            .eye { width: 60px; height: 60px; }
+        }
+
+        /* Common section styling */
+        section {
+            padding: 8rem 2rem;
+        }
+
+        section h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        /* Calendar Improvements */
+        .calendar {
+            background: #1a1a1a;
+            padding: 2rem;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .calendar-header {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: #2a2a2a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .calendar-day.has-event {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .price-card {
+            background: rgba(0,0,0,0.3);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s backwards;
+        }
+
+        .price-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+        }
+
+        .price-amount {
+            font-size: 3rem;
+            margin: 2rem 0;
+            color: var(--primary);
+        }
+
+        .price-card:nth-child(1) { animation-delay: 0.2s; }
+        .price-card:nth-child(2) { animation-delay: 0.4s; }
+        .price-card:nth-child(3) { animation-delay: 0.6s; }
+
+        .price-card:hover .price-amount {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* About Section */
+        .about {
+            background: #232323;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .about-text {
+            animation: fadeInLeft 1s ease;
+        }
+
+        .about-image {
+            position: relative;
+            animation: fadeInRight 1s ease;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* New Animations */
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Emoji Animation */
+        .emoji {
+            font-size: 2.5rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        /* Download Section */
+        .downloads {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            position: relative;
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .download-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .download-card:hover::before {
+            left: 100%;
+        }
+
+        .download-button {
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Enhanced Price Card Animations */
+        .feature-card {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card:hover {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+        }
+
+        .feature-emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover .feature-emoji {
+            transform: rotateY(360deg);
+        }
+
+        /* Add parallax effect */
+        .parallax-section {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, #2a2a2a 0%, #1a1a1a 100%);
+            transform: translateZ(-1px) scale(2);
+            z-index: -1;
+        }
+
+        /* Add floating elements */
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            pointer-events: none;
+            filter: blur(2px);
+            animation: floatAround 15s infinite;
+        }
+
+        @keyframes floatAround {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(200px, 0) rotate(180deg); }
+            75% { transform: translate(100px, 100px) rotate(270deg); }
+        }
+
+        /* Add scroll reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal-left.active, .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Add glow effects */
+        .glow-hover {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-hover::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .glow-hover:hover::after {
+            opacity: 1;
+        }
+
+        /* Enhanced Roadmap Styling */
+        .roadmap {
+            background: linear-gradient(135deg, #1a1a1a 0%, #232323 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            padding: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient);
+            transform: translateX(-50%);
+            border-radius: 2px;
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+        }
+
+        .milestone {
+            width: calc(50% - 50px);
+            margin: 2rem 0;
+            position: relative;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .milestone::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.8);
+            z-index: 2;
+        }
+
+        .milestone::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background: var(--gradient);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .milestone:nth-child(odd) {
+            margin-right: auto;
+            transform: translateX(-100px);
+        }
+
+        .milestone:nth-child(even) {
+            margin-left: auto;
+            transform: translateX(100px);
+        }
+
+        .milestone:nth-child(odd)::before {
+            right: -60px;
+        }
+
+        .milestone:nth-child(even)::before {
+            left: -60px;
+        }
+
+        .milestone:nth-child(odd)::after {
+            right: -50px;
+        }
+
+        .milestone:nth-child(even)::after {
+            left: -50px;
+        }
+
+        .milestone.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .milestone-content {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(74, 144, 226, 0.1);
+        }
+
+        .milestone-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(74, 144, 226, 0.3);
+        }
+
+        .milestone h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .milestone .date {
+            position: absolute;
+            top: -30px;
+            background: var(--gradient);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .milestone:nth-child(odd) .date {
+            right: 0;
+        }
+
+        .milestone-progress {
+            height: 4px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 2px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient);
+            width: 0;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .milestone.visible .progress-bar {
+            width: 100%;
+        }
+
+        /* Enhanced Features Section */
+        .features {
+            background: linear-gradient(135deg, #1a1a1a 0%, #232323 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .features h2 {
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .features h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            perspective: 1000px;
+        }
+
+        .feature-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) rotateX(10deg);
+            border-color: rgba(74, 144, 226, 0.5);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            border-radius: 20px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateZ(30px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-emoji {
+            font-size: 3rem;
+            filter: none;
+            animation: iconFloat 6s ease-in-out infinite;
+        }
+
+        .feature-card:hover .feature-emoji {
+            animation: iconPop 0.5s ease-out;
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateZ(20px);
+        }
+
+        .feature-card p {
+            color: var(--light);
+            line-height: 1.8;
+            transform: translateZ(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, 
+                rgba(74, 144, 226, 0.1) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) rotateY(0); }
+            50% { transform: translateY(-10px) rotateY(10deg); }
+        }
+
+        @keyframes iconPop {
+            0% { transform: scale(1) rotate(0); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        /* Feature card staggered animation */
+        .feature-card {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .feature-card.animate {
+            animation: featureCardIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.2s; }
+        .feature-card:nth-child(2) { animation-delay: 0.4s; }
+        .feature-card:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes featureCardIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) rotateX(10deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        /* Enhanced Pricing Section */
+        .pricing {
+            background: linear-gradient(135deg, #1a1a1a 0%, #232323 100%);
+            padding: 8rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, 
+                rgba(74, 144, 226, 0.1) 0%,
+                transparent 50%);
+            top: -50%;
+            left: -50%;
+            animation: rotateBg 20s linear infinite;
+        }
+
+        @keyframes rotateBg {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .price-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(0);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .price-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: var(--gradient);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask:
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        .price-tag {
+            position: absolute;
+            top: 0;
+            right: 2rem;
+            background: var(--gradient);
+            padding: 0.5rem 1.5rem;
+            border-radius: 0 0 15px 15px;
+            font-weight: bold;
+            transform: translateZ(30px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 1rem;
+            left: 0;
+            background: var(--gradient);
+            padding: 0.5rem 1.5rem;
+            border-radius: 0 20px 20px 0;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transform: translateZ(30px);
+        }
+
+        .price-features {
+            list-style: none;
+            margin: 2rem 0;
+            transform: translateZ(15px);
+        }
+
+        .price-features li {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .price-features li:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(5px);
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--primary);
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Enhanced Pricing Section */
+        .price-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .price-card:hover {
+            transform: translateY(-20px) rotateX(12deg) rotateY(-10deg);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 100px rgba(74, 144, 226, 0.1);
+        }
+
+        .price-card.popular:hover {
+            transform: scale(1.05) translateY(-20px) rotateX(12deg) rotateY(-10deg);
+        }
+
+        /* Enhanced Development Log */
+        .calendar-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #232323 100%);
+        }
+
+        .calendar-container {
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            transform-style: preserve-3d;
+        }
+
+        .calendar-day {
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-5px) rotateX(10deg) rotateY(10deg);
+            box-shadow: 0 15px 30px rgba(74, 144, 226, 0.2);
+        }
+
+        /* Enhanced About Section */
+        .about-grid {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .about-text {
+            transform: translateZ(50px);
+            opacity: 0;
+            animation: fadeInText 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .about-image {
+            transform: translateZ(30px);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .about-image:hover {
+            transform: translateZ(50px) rotateY(-15deg);
+        }
+
+        @keyframes fadeInText {
+            from {
+                opacity: 0;
+                transform: translateZ(0) translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateZ(50px) translateX(0);
+            }
+        }
+
+        /* Enhanced Download Section */
+        .download-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .download-card:hover {
+            transform: translateY(-15px) rotateX(10deg) rotateY(-10deg);
+            box-shadow: 
+                20px 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(74, 144, 226, 0.1);
+        }
+
+        .download-button {
+            transform: translateZ(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .download-button:hover {
+            transform: translateZ(30px) scale(1.1);
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(74, 144, 226, 0.2);
+        }
+
+        /* Feature Card Expansion */
+        .feature-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .feature-expanded {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            transform: translate(-50%, -50%) scale(0.7);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(74, 144, 226, 0.2);
+        }
+
+        .feature-expanded.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .feature-expanded .feature-icon {
+            transform: scale(1.5);
+            margin: 2rem auto 3rem;
+        }
+
+        .feature-expanded h3 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-expanded p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .feature-details {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(74, 144, 226, 0.2);
+        }
+
+        .feature-detail-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-expanded.active .feature-detail-item {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .feature-detail-item:nth-child(1) { transition-delay: 0.1s; }
+        .feature-detail-item:nth-child(2) { transition-delay: 0.2s; }
+        .feature-detail-item:nth-child(3) { transition-delay: 0.3s; }
+
+        .feature-detail-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--primary);
+        }
+
+        .close-feature {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-feature:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        /* Cool Features Section */
+        .cool-features {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            padding: 8rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cool-features::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle at center,
+                rgba(74, 144, 226, 0.1) 0%,
+                transparent 50%
+            );
+            animation: rotate 20s linear infinite;
+        }
+
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cool-feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cool-feature-card:hover {
+            transform: perspective(1000px) translateY(-10px) rotateX(10deg) rotateY(-10deg);
+            border-color: rgba(74, 144, 226, 0.5);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .feature-icon-3d {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(30px);
+        }
+
+        .icon-front, .icon-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background: var(--gradient);
+            border-radius: 20px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .icon-back {
+            transform: rotateY(180deg);
+        }
+
+        .cool-feature-card:hover .icon-front {
+            transform: rotateY(180deg);
+        }
+
+        .cool-feature-card:hover .icon-back {
+            transform: rotateY(360deg);
+        }
+
+        .feature-content {
+            transform: translateZ(20px);
+        }
+
+        .feature-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-description {
+            color: var(--light);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Page Handling */
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            min-height: 100vh;  /* Ensure minimum height */
+            overflow: auto;     /* Enable scrolling within page */
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Blog Section */
+        .blog {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #1a1a1a 0%, #232323 100%);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .blog-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: var(--gradient);
+        }
+
+        .blog-content {
+            padding: 2rem;
+        }
+
+        .blog-date {
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .blog-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .blog-excerpt {
+            color: #ccc;
+            margin-bottom: 1.5rem;
+        }
+
+        .blog-link {
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .blog-link:hover {
+            transform: translateX(10px);
+        }
+
+        /* Blog Modal Styles */
+        .blog-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .blog-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .blog-modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            margin: 2rem auto;
+            background: var(--dark);
+            border-radius: 20px;
+            padding: 3rem;
+            overflow-y: auto;
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .blog-modal.active .blog-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .close-blog {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-blog:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .full-article {
+            color: var(--light);
+        }
+
+        .full-article h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .full-article .date {
+            color: var(--primary);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .full-article p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="logo">ThinkBot</div>
+            <div class="nav-links">
+                <a href="#home" data-page="home">Home</a>
+                <a href="#pricing" data-page="pricing">Pricing</a>
+                <a href="#downloads" data-page="downloads">Downloads</a>
+                <a href="#blog" data-page="blog">Blog</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="floating-elements">
+        <div class="floating-element">🤖</div>
+        <div class="floating-element">💡</div>
+        <div class="floating-element">⚡</div>
+        <div class="floating-element">🔮</div>
+        <div class="floating-element">🎯</div>
+    </div>
+
+    <div id="home" class="page active">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="robot">
+                    <div class="eye-container">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                </div>
+                <h1>ThinkBot AI</h1>
+                <p>The future of artificial intelligence</p>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Amazing Features <span class="emoji">✨</span></h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="feature-emoji">🤖</span>
+                    </div>
+                    <h3>Advanced AI</h3>
+                    <p>State-of-the-art neural networks and natural language processing that evolves with every interaction.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="feature-emoji">🧠</span>
+                    </div>
+                    <h3>Machine Learning</h3>
+                    <p>Adaptive learning algorithms that continuously improve and personalize your experience.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <span class="feature-emoji">💡</span>
+                    </div>
+                    <h3>Smart Assistant</h3>
+                    <p>Intuitive task automation and emotional intelligence for natural interactions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="roadmap">
+            <h2>Project Roadmap <span class="emoji">📈</span></h2>
+            <div class="timeline">
+                <div class="milestone">
+                    <div class="milestone-content">
+                        <span class="date">January 2024</span>
+                        <h3>Core Development</h3>
+                        <p>Basic AI functionality and voice recognition system implementation</p>
+                        <div class="milestone-progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone-content">
+                        <span class="date">February 2024</span>
+                        <h3>Enhanced Learning</h3>
+                        <p>Advanced machine learning capabilities and emotional response system</p>
+                        <div class="milestone-progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone-content">
+                        <span class="date">March 2024</span>
+                        <h3>Advanced Features</h3>
+                        <p>Timer functionality, improved animations, and user interaction updates</p>
+                        <div class="milestone-progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="milestone-content">
+                        <span class="date">April 2024</span>
+                        <h3>Platform Expansion</h3>
+                        <p>Cross-platform support and cloud integration features</p>
+                        <div class="milestone-progress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="pricing" class="page">
+        <section class="pricing">
+            <h2>Choose Your Plan <span class="emoji">🚀</span></h2>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <div class="price-tag">Basic</div>
+                    <h3>Starter</h3>
+                    <div class="price-amount">$29</div>
+                    <ul class="price-features">
+                        <li>Voice Recognition</li>
+                        <li>Basic AI Responses</li>
+                        <li>Standard Support</li>
+                        <li>Community Access</li>
+                    </ul>
+                    <a href="#" class="price-button">Get Started</a>
+                </div>
+                
+                <div class="price-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="price-tag">Pro</div>
+                    <h3>Professional</h3>
+                    <div class="price-amount">$99</div>
+                    <ul class="price-features">
+                        <li>Advanced AI Learning</li>
+                        <li>Emotional Intelligence</li>
+                        <li>24/7 Priority Support</li>
+                        <li>Custom Integrations</li>
+                    </ul>
+                    <a href="#" class="price-button">Upgrade Now</a>
+                </div>
+                
+                <div class="price-card">
+                    <div class="price-tag">Enterprise</div>
+                    <h3>Enterprise</h3>
+                    <div class="price-amount">Custom</div>
+                    <ul class="price-features">
+                        <li>Custom Integration</li>
+                        <li>Dedicated Resources</li>
+                        <li>Personal Account Manager</li>
+                        <li>SLA Agreement</li>
+                    </ul>
+                    <a href="#" class="price-button">Contact Sales</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="downloads" class="page">
+        <section class="downloads">
+            <h2>Download Now <span class="emoji">⚡</span></h2>
+            <div class="download-grid">
+                <div class="download-card reveal">
+                    <span class="emoji">🖥️</span>
+                    <h3>Windows</h3>
+                    <p>Version 1.2.0</p>
+                    <a href="#" class="download-button">Download for Windows</a>
+                </div>
+                <div class="download-card reveal">
+                    <span class="emoji">🍎</span>
+                    <h3>MacOS</h3>
+                    <p>Version 1.2.0</p>
+                    <a href="#" class="download-button">Download for Mac</a>
+                </div>
+                <div class="download-card reveal">
+                    <span class="emoji">🐧</span>
+                    <h3>Linux</h3>
+                    <p>Version 1.2.0</p>
+                    <a href="#" class="download-button">Download for Linux</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="blog" class="page">
+        <section class="blog">
+            <h2>Latest Updates <span class="emoji">📝</span></h2>
+            <div class="blog-grid">
+                <article class="blog-card" data-article-id="1">
+                    <div class="blog-image"></div>
+                    <div class="blog-content">
+                        <div class="blog-date">March 15, 2024</div>
+                        <h3 class="blog-title">Advanced AI Features Released</h3>
+                        <p class="blog-excerpt">Discover the latest improvements in our AI's cognitive capabilities and emotional intelligence...</p>
+                        <a href="#" class="blog-link">Read More →</a>
+                    </div>
+                </article>
+                <article class="blog-card" data-article-id="2">
+                    <div class="blog-image"></div>
+                    <div class="blog-content">
+                        <div class="blog-date">March 10, 2024</div>
+                        <h3 class="blog-title">The Future of AI Interaction</h3>
+                        <p class="blog-excerpt">Exploring how ThinkBot is revolutionizing human-AI interaction through natural language processing...</p>
+                        <a href="#" class="blog-link">Read More →</a>
+                    </div>
+                </article>
+                <article class="blog-card" data-article-id="3">
+                    <div class="blog-image"></div>
+                    <div class="blog-content">
+                        <div class="blog-date">March 5, 2024</div>
+                        <h3 class="blog-title">Community Spotlight</h3>
+                        <p class="blog-excerpt">See how our users are implementing ThinkBot in innovative ways across different industries...</p>
+                        <a href="#" class="blog-link">Read More →</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="calendar-section">
+            <h2>Development Log</h2>
+            <div class="calendar-container">
+                <div class="calendar"></div>
+                <div class="event-details">
+                    <h3>Select a date to view details</h3>
+                </div>
+            </div>
+        </section>
+
+        <div class="blog-modal">
+            <div class="blog-modal-content">
+                <button class="close-blog">×</button>
+                <div class="full-article"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="feature-modal-overlay">
+        <div class="feature-expanded">
+            <button class="close-feature">×</button>
+            <div class="feature-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Eye tracking
+        document.addEventListener('mousemove', (e) => {
+            const eyes = document.querySelectorAll('.eye');
+            const container = document.querySelector('.eye-container');
+            
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Calculate angle and distance
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+            const distance = Math.min(30, Math.hypot(e.clientX - centerX, e.clientY - centerY) / 10);
+            
+            // Calculate movement
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+            
+            // Move both eyes together
+            eyes.forEach(eye => {
+                eye.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Generate LED lines
+        function createLedLines() {
+            const eyes = document.querySelectorAll('.eye');
+            eyes.forEach(eye => {
+                for(let i = 0; i < 20; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'led-line';
+                    line.style.animationDelay = `${i * 0.1}s`;
+                    eye.appendChild(line);
+                }
+            });
+        }
+
+        // Add random behaviors
+        function randomBehaviors() {
+            const eyes = document.querySelectorAll('.eye');
+            
+            setInterval(() => {
+                const behavior = Math.random();
+                
+                if (behavior < 0.3) {
+                    // Squint
+                    eyes.forEach(eye => {
+                        eye.classList.add('squinting');
+                        setTimeout(() => eye.classList.remove('squinting'), 300);
+                    });
+                } else if (behavior < 0.6) {
+                    // Look around
+                    eyes.forEach(eye => {
+                        eye.classList.add('looking');
+                        setTimeout(() => eye.classList.remove('looking'), 4000);
+                    });
+                }
+            }, 5000);
+        }
+
+        // Updated eye movement
+        function moveEyes() {
+            const container = document.querySelector('.eye-container');
+            const sequence = ['center', 'left', 'center', 'right', 'center'];
+            let index = 0;
+            
+            setInterval(() => {
+                const position = sequence[index];
+                let translateX = 0;
+                
+                switch(position) {
+                    case 'left':
+                        translateX = -50;
+                        break;
+                    case 'right':
+                        translateX = 50;
+                        break;
+                }
+                
+                container.style.transform = `translateY(-50%) translateX(${translateX}px)`;
+                index = (index + 1) % sequence.length;
+                
+                // Random squint
+                if(Math.random() < 0.3) {
+                    container.classList.add('squinting');
+                    setTimeout(() => container.classList.remove('squinting'), 300);
+                }
+            }, 2000);
+        }
+
+        // Automatic eye movement when mouse is not moving
+        setInterval(() => {
+            if (!window.lastMouseMove || Date.now() - window.lastMouseMove > 2000) {
+                const randomX = Math.random() * window.innerWidth;
+                const randomY = Math.random() * window.innerHeight;
+                updateEyePosition(randomX, randomY);
+            }
+        }, 2000);
+
+        // Development log calendar
+        const events = {
+            '2024-01-15': 'Initial AI implementation',
+            '2024-01-20': 'Added voice recognition',
+            '2024-02-01': 'Implemented emotional responses',
+            '2024-02-15': 'Enhanced learning capabilities',
+            '2024-03-01': 'Added timer functionality',
+            '2024-03-15': 'Improved eye animations'
+        };
+
+        // Enhanced calendar creation
+        function createCalendar() {
+            const calendar = document.querySelector('.calendar');
+            const eventDetails = document.querySelector('.event-details');
+            
+            // Add day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const header = document.createElement('div');
+            header.className = 'calendar-header';
+            days.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.textContent = day;
+                header.appendChild(dayEl);
+            });
+            calendar.appendChild(header);
+            
+            // Add more events
+            const moreEvents = {
+                '2024-01-05': 'Project ThinkBot',
+                '2024-01-10': 'Initial design phase',
+                '2024-01-15': 'Core AI implementation',
+                '2024-01-20': 'Voice recognition integration',
+                '2024-01-25': 'Emotional response system',
+                '2024-02-01': 'Beta testing phase',
+                '2024-02-05': 'UI/UX improvements',
+                '2024-02-10': 'Performance optimization',
+                '2024-02-15': 'Enhanced learning capabilities',
+                '2024-02-20': 'Security enhancements',
+                '2024-02-25': 'Documentation updates',
+                '2024-03-01': 'Timer functionality added',
+                '2024-03-05': 'Bug fixes and improvements',
+                '2024-03-10': 'Feature expansion',
+                '2024-03-15': 'Eye animation improvements'
+            };
+
+            // Create calendar grid
+            Object.entries(moreEvents).forEach(([date, description]) => {
+                const day = document.createElement('div');
+                day.className = 'calendar-day has-event';
+                day.textContent = new Date(date).getDate();
+                
+                day.addEventListener('click', () => {
+                    eventDetails.classList.remove('visible');
+                    setTimeout(() => {
+                        eventDetails.innerHTML = `
+                            <h3>${date}</h3>
+                            <p>${description}</p>
+                        `;
+                        eventDetails.classList.add('visible');
+                    }, 300);
+                });
+                
+                calendar.appendChild(day);
+            });
+        }
+
+        // Enhanced milestone animation
+        function animateMilestones() {
+            const milestones = document.querySelectorAll('.milestone');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Add slight delay between milestone animations
+                        const index = Array.from(milestones).indexOf(entry.target);
+                        setTimeout(() => {
+                            entry.target.querySelector('.progress-bar').style.width = '100%';
+                        }, index * 200);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            milestones.forEach(milestone => observer.observe(milestone));
+        }
+
+        // Add animation to emojis
+        function animateEmojis() {
+            const emojis = document.querySelectorAll('.emoji');
+            emojis.forEach(emoji => {
+                emoji.style.animationDelay = `${Math.random()}s`;
+            });
+        }
+
+        // Enhanced scroll animations
+        function initScrollAnimations() {
+            const elements = document.querySelectorAll('.feature-card, .price-card, .download-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            elements.forEach(el => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(30px)';
+                observer.observe(el);
+            });
+        }
+
+        // Add scroll reveal
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+            
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        // Add floating elements
+        function createFloatingElements() {
+            const container = document.querySelector('.floating-elements');
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            container.querySelectorAll('.floating-element').forEach(element => {
+                element.style.left = `${Math.random() * screenWidth}px`;
+                element.style.top = `${Math.random() * screenHeight}px`;
+                element.style.animationDelay = `${Math.random() * 5}s`;
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createLedLines();
+            moveEyes();
+            createCalendar();
+            animateMilestones();
+            randomBehaviors();
+            
+            // Add scroll animations for new sections
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.price-card, .about-text, .about-image').forEach(el => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(50px)';
+                observer.observe(el);
+            });
+
+            animateEmojis();
+            initScrollAnimations();
+
+            // Add scroll event listener
+            window.addEventListener('scroll', revealOnScroll);
+            revealOnScroll(); // Initial check
+            
+            // Setup eye movement
+            document.addEventListener('mousemove', updateEyePosition);
+            createFloatingElements();
+            
+            // Add reveal classes to elements
+            document.querySelectorAll('.feature-card').forEach((card, index) => {
+                card.classList.add('reveal');
+                card.style.transitionDelay = `${index * 0.1}s`;
+            });
+            
+            document.querySelectorAll('.price-card').forEach((card, index) => {
+                card.classList.add('reveal');
+                card.style.transitionDelay = `${index * 0.1}s`;
+            });
+            
+            document.querySelectorAll('.milestone').forEach((milestone, index) => {
+                milestone.classList.add(index % 2 ? 'reveal-right' : 'reveal-left');
+                milestone.style.transitionDelay = `${index * 0.1}s`;
+            });
+            
+            // Add glow effect to cards
+            document.querySelectorAll('.feature-card, .price-card, .download-card')
+                .forEach(card => card.classList.add('glow-hover'));
+
+            // Enhanced feature card animations
+            function animateFeatures() {
+                const cards = document.querySelectorAll('.feature-card');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate');
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                cards.forEach(card => observer.observe(card));
+            }
+
+            // Add to initialization
+            animateFeatures();
+        });
+
+        // Add hover effect detection for pricing cards
+        document.querySelectorAll('.price-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const rotateY = ((x - rect.width / 2) / rect.width) * 10;
+                const rotateX = ((y - rect.height / 2) / rect.height) * -10;
+                
+                card.style.transform = `translateY(-20px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+
+        // Feature card expansion
+        const featureCards = document.querySelectorAll('.feature-card');
+        const overlay = document.querySelector('.feature-modal-overlay');
+        const expandedCard = document.querySelector('.feature-expanded');
+        const closeButton = document.querySelector('.close-feature');
+
+        const featureDetails = {
+            'Advanced AI': {
+                description: `Our state-of-the-art neural networks represent the cutting edge of artificial intelligence. 
+                             Using deep learning and advanced pattern recognition, our AI continuously evolves and adapts 
+                             to provide increasingly sophisticated interactions and solutions.`,
+                details: [
+                    { icon: '🔮', text: 'Self-improving neural networks that evolve with each interaction' },
+                    { icon: '🎯', text: 'Context-aware responses with emotional intelligence' },
+                    { icon: '⚡', text: 'Real-time processing with minimal latency' }
+                ]
+            },
+            'Machine Learning': {
+                description: `Leveraging the power of adaptive learning algorithms, our system continually refines its 
+                             understanding and responses. This creates a truly personalized experience that grows more 
+                             intuitive with every interaction.`,
+                details: [
+                    { icon: '📊', text: 'Advanced pattern recognition and data analysis' },
+                    { icon: '🔄', text: 'Continuous learning and adaptation' },
+                    { icon: '🎓', text: 'Personalized interaction patterns' }
+                ]
+            },
+            'Smart Assistant': {
+                description: `More than just a basic helper, our Smart Assistant combines intuitive task automation 
+                             with emotional intelligence to create natural, meaningful interactions that feel truly personal 
+                             and engaging.`,
+                details: [
+                    { icon: '⚙️', text: 'Automated task management and scheduling' },
+                    { icon: '🗣️', text: 'Natural language processing and generation' },
+                    { icon: '❤️', text: 'Emotional response adaptation' }
+                ]
+            }
+        };
+
+        function openFeatureCard(card) {
+            const title = card.querySelector('h3').textContent;
+            const details = featureDetails[title];
+            const content = expandedCard.querySelector('.feature-content');
+            
+            content.innerHTML = `
+                <div class="feature-icon">
+                    ${card.querySelector('.feature-icon').innerHTML}
+                </div>
+                <h3>${title}</h3>
+                <p>${details.description}</p>
+                <div class="feature-details">
+                    ${details.details.map(detail => `
+                        <div class="feature-detail-item">
+                            <span class="feature-detail-icon">${detail.icon}</span>
+                            <p>${detail.text}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            overlay.classList.add('active');
+            expandedCard.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFeatureCard() {
+            overlay.classList.remove('active');
+            expandedCard.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        featureCards.forEach(card => {
+            card.addEventListener('click', () => openFeatureCard(card));
+        });
+
+        closeButton.addEventListener('click', closeFeatureCard);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeFeatureCard();
+        });
+
+        // Add hover effect for cool feature cards
+        document.querySelectorAll('.cool-feature-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const rotateY = ((x - rect.width / 2) / rect.width) * 20;
+                const rotateX = ((y - rect.height / 2) / rect.height) * -20;
+                
+                card.style.transform = `perspective(1000px) translateY(-10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px)';
+            });
+        });
+
+        // Add this at the beginning of your script section
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Update navigation handling
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = link.getAttribute('data-page');
+                showPage(pageId);
+                
+                // Update active state
+                document.querySelectorAll('.nav-links a').forEach(a => {
+                    a.classList.remove('active');
+                });
+                link.classList.add('active');
+            });
+        });
+
+        // Blog article content
+        const articles = {
+            1: {
+                title: "Advanced AI Features Released",
+                date: "March 15, 2024",
+                content: `
+                    <h1>Advanced AI Features Released</h1>
+                    <div class="date">March 15, 2024</div>
+                    <p>We're excited to announce the latest improvements in our AI's cognitive capabilities and emotional intelligence. This update represents a significant leap forward in how ThinkBot understands and responds to complex user interactions.</p>
+                    <p>Key improvements include:</p>
+                    <ul>
+                        <li>Enhanced natural language processing</li>
+                        <li>More nuanced emotional responses</li>
+                        <li>Improved context awareness</li>
+                        <li>Faster processing times</li>
+                    </ul>
+                    <p>Our team has been working tirelessly to push the boundaries of what's possible with AI technology. These new features are just the beginning of our journey to create more meaningful and natural AI interactions.</p>
+                `
+            },
+            2: {
+                title: "The Future of AI Interaction",
+                date: "March 10, 2024",
+                content: `
+                    <h1>The Future of AI Interaction</h1>
+                    <div class="date">March 10, 2024</div>
+                    <p>ThinkBot is revolutionizing how humans and AI systems interact. Through advanced natural language processing and machine learning algorithms, we're creating more intuitive and responsive AI experiences.</p>
+                    <p>Our latest research shows that users spend 50% more time engaging with AI systems that demonstrate emotional intelligence and contextual awareness. This insight has driven our development focus for the past quarter.</p>
+                    <p>Looking ahead, we're exploring new ways to make AI interactions even more natural and meaningful. Stay tuned for more updates on our progress.</p>
+                `
+            },
+            3: {
+                title: "Community Spotlight",
+                date: "March 5, 2024",
+                content: `
+                    <h1>Community Spotlight</h1>
+                    <div class="date">March 5, 2024</div>
+                    <p>Our community continues to amaze us with innovative implementations of ThinkBot across various industries. From healthcare to education, users are finding creative ways to leverage our AI technology.</p>
+                    <p>Featured implementations:</p>
+                    <ul>
+                        <li>Medical diagnosis assistance systems</li>
+                        <li>Interactive educational platforms</li>
+                        <li>Customer service automation</li>
+                        <li>Research and data analysis tools</li>
+                    </ul>
+                    <p>We're proud to support these groundbreaking applications and look forward to seeing what our community creates next.</p>
+                `
+            }
+        };
+
+        // Blog expansion functionality
+        document.querySelectorAll('.blog-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const articleId = card.getAttribute('data-article-id');
+                const article = articles[articleId];
+                const modal = document.querySelector('.blog-modal');
+                const content = modal.querySelector('.full-article');
+                
+                content.innerHTML = article.content;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Close blog modal
+        document.querySelector('.close-blog').addEventListener('click', () => {
+            document.querySelector('.blog-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Close modal on outside click
+        document.querySelector('.blog-modal').addEventListener('click', (e) => {
+            if (e.target === document.querySelector('.blog-modal')) {
+                document.querySelector('.blog-modal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+</body>
+</html>
